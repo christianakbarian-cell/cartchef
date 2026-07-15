@@ -108,22 +108,40 @@ export default function App() {
       setActiveRecipe(null)
 
       const activeAppliances = APPLIANCES.filter((a) => appliances[a.id]).map((a) => a.apiName)
-      const equipmentParam =
-        activeAppliances.length > 0
-          ? `&equipment=${encodeURIComponent(activeAppliances.join(','))}`
-          : ''
 
-      const url =
+      // One URL per appliance so each selection expands results (OR logic).
+      // A single comma-separated &equipment= value is treated as AND by Spoonacular,
+      // which returns near-zero results when multiple appliances are selected.
+      const baseUrl =
         `https://api.spoonacular.com/recipes/complexSearch` +
         `?apiKey=${import.meta.env.VITE_SPOONACULAR_KEY}` +
-        `&number=12&fillIngredients=true&addRecipeInformation=true` +
-        equipmentParam
+        `&number=9&fillIngredients=true&addRecipeInformation=true`
+
+      const urls =
+        activeAppliances.length > 0
+          ? activeAppliances.map((name) => `${baseUrl}&equipment=${encodeURIComponent(name)}`)
+          : [baseUrl]   // no appliances checked → general results, no equipment filter
 
       try {
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
-        const data = await res.json()
-        if (!cancelled) setRecipes((data.results ?? []).map(mapRecipe))
+        const responses = await Promise.all(urls.map((url) => fetch(url)))
+        for (const res of responses) {
+          if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
+        }
+        const dataArr = await Promise.all(responses.map((res) => res.json()))
+
+        // Flatten results and deduplicate by recipe ID
+        const seen = new Set()
+        const merged = []
+        for (const data of dataArr) {
+          for (const r of (data.results ?? [])) {
+            if (!seen.has(r.id)) {
+              seen.add(r.id)
+              merged.push(r)
+            }
+          }
+        }
+
+        if (!cancelled) setRecipes(merged.map(mapRecipe))
       } catch (err) {
         if (!cancelled) setFetchError(err.message || 'Failed to load recipes.')
       } finally {
