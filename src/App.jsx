@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const APPLIANCES = [
   { id: 'microwave', label: 'Microwave', emoji: '📡', apiName: 'microwave' },
@@ -93,6 +93,9 @@ export default function App() {
   const [isOrdering, setIsOrdering] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
+  // Persists across renders; never triggers re-renders
+  const recipeCache = useRef(new Map())
+
   // Serialize appliances to a stable string for the effect dependency
   const applianceKey = JSON.stringify(appliances)
 
@@ -109,31 +112,38 @@ export default function App() {
 
       const activeAppliances = APPLIANCES.filter((a) => appliances[a.id]).map((a) => a.apiName)
 
-      // One URL per appliance so each selection expands results (OR logic).
-      // A single comma-separated &equipment= value is treated as AND by Spoonacular,
-      // which returns near-zero results when multiple appliances are selected.
+      // Cache keys: one per appliance name, or '__all__' when nothing is selected
+      const cacheKeys = activeAppliances.length > 0 ? activeAppliances : ['__all__']
+
+      // Only hit the API for keys not already in the session cache
+      const uncachedKeys = cacheKeys.filter((key) => !recipeCache.current.has(key))
+
       const baseUrl =
         `https://api.spoonacular.com/recipes/complexSearch` +
         `?apiKey=${import.meta.env.VITE_SPOONACULAR_KEY}` +
         `&number=9&fillIngredients=true&addRecipeInformation=true`
 
-      const urls =
-        activeAppliances.length > 0
-          ? activeAppliances.map((name) => `${baseUrl}&equipment=${encodeURIComponent(name)}`)
-          : [baseUrl]   // no appliances checked → general results, no equipment filter
-
       try {
-        const responses = await Promise.all(urls.map((url) => fetch(url)))
-        for (const res of responses) {
-          if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
+        if (uncachedKeys.length > 0) {
+          const urls = uncachedKeys.map((key) =>
+            key === '__all__' ? baseUrl : `${baseUrl}&equipment=${encodeURIComponent(key)}`
+          )
+          const responses = await Promise.all(urls.map((url) => fetch(url)))
+          for (const res of responses) {
+            if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
+          }
+          const dataArr = await Promise.all(responses.map((res) => res.json()))
+          // Store each appliance's raw results in the cache
+          uncachedKeys.forEach((key, i) => {
+            recipeCache.current.set(key, dataArr[i].results ?? [])
+          })
         }
-        const dataArr = await Promise.all(responses.map((res) => res.json()))
 
-        // Flatten results and deduplicate by recipe ID
+        // All active keys are now cached — flatten and deduplicate by recipe ID
         const seen = new Set()
         const merged = []
-        for (const data of dataArr) {
-          for (const r of (data.results ?? [])) {
+        for (const key of cacheKeys) {
+          for (const r of (recipeCache.current.get(key) ?? [])) {
             if (!seen.has(r.id)) {
               seen.add(r.id)
               merged.push(r)
@@ -244,17 +254,17 @@ export default function App() {
   const currentRecipe = recipes.find((r) => r.id === activeRecipe)
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-100">
+    <div className="min-h-screen bg-gray-50 font-sans text-slate-900">
       {/* Header */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="text-2xl">🍳</span>
-            <span className="text-xl font-bold text-white tracking-tight">
-              Dorm<span className="text-amber-400">Chef</span>
+            <span className="text-xl font-bold text-slate-900 tracking-tight">
+              Dorm<span className="text-amber-500">Chef</span>
             </span>
           </div>
-          <p className="text-sm text-slate-500 hidden sm:block">
+          <p className="text-sm text-slate-400 hidden sm:block">
             Pick recipes · Build your cart · Order groceries
           </p>
         </div>
@@ -267,15 +277,15 @@ export default function App() {
             {!activeRecipe ? (
               <div>
                 <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-white">Dorm Recipes</h1>
-                  <p className="text-slate-400 mt-1 text-sm">
+                  <h1 className="text-2xl font-bold text-slate-900">Dorm Recipes</h1>
+                  <p className="text-slate-500 mt-1 text-sm">
                     Select your gear below — we'll find recipes that match.
                   </p>
                 </div>
 
                 {/* Appliance Checklist */}
-                <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-5 mb-6">
-                  <h2 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+                <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6 shadow-sm">
+                  <h2 className="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2">
                     <span>🔌</span> Your Appliances
                   </h2>
                   <div className="flex flex-wrap gap-3">
@@ -287,14 +297,14 @@ export default function App() {
                           onClick={() => toggleAppliance(appliance.id)}
                           className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all select-none ${
                             active
-                              ? 'bg-amber-500/15 border-amber-400/60 text-amber-300'
-                              : 'bg-slate-700/50 border-slate-600 text-slate-500 line-through'
+                              ? 'bg-amber-50 border-amber-300 text-amber-700'
+                              : 'bg-gray-100 border-gray-200 text-slate-400 line-through'
                           }`}
                         >
                           <span>{appliance.emoji}</span>
                           {appliance.label}
                           {active && (
-                            <svg className="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <svg className="w-3.5 h-3.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                           )}
@@ -308,17 +318,17 @@ export default function App() {
                 {isLoading && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                     {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden animate-pulse">
-                        <div className="bg-slate-700 h-36" />
+                      <div key={i} className="bg-white rounded-2xl border border-gray-200 overflow-hidden animate-pulse shadow-sm">
+                        <div className="bg-gray-200 h-36" />
                         <div className="p-5 space-y-3">
-                          <div className="bg-slate-700 rounded-lg h-4 w-3/4" />
-                          <div className="bg-slate-700 rounded-lg h-3 w-full" />
-                          <div className="bg-slate-700 rounded-lg h-3 w-2/3" />
+                          <div className="bg-gray-200 rounded-lg h-4 w-3/4" />
+                          <div className="bg-gray-200 rounded-lg h-3 w-full" />
+                          <div className="bg-gray-200 rounded-lg h-3 w-2/3" />
                           <div className="flex gap-2 mt-1">
-                            <div className="bg-slate-700 rounded h-3 w-12" />
-                            <div className="bg-slate-700 rounded h-3 w-16" />
+                            <div className="bg-gray-200 rounded h-3 w-12" />
+                            <div className="bg-gray-200 rounded h-3 w-16" />
                           </div>
-                          <div className="bg-slate-700 rounded-xl h-10 w-full mt-3" />
+                          <div className="bg-gray-200 rounded-xl h-10 w-full mt-3" />
                         </div>
                       </div>
                     ))}
@@ -329,11 +339,11 @@ export default function App() {
                 {!isLoading && fetchError && (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
                     <div className="text-5xl mb-4">⚠️</div>
-                    <p className="text-slate-200 font-semibold mb-1">Couldn't load recipes</p>
+                    <p className="text-slate-800 font-semibold mb-1">Couldn't load recipes</p>
                     <p className="text-slate-500 text-sm mb-6 max-w-xs">{fetchError}</p>
                     <button
                       onClick={() => setFetchVersion((v) => v + 1)}
-                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
+                      className="bg-amber-500 hover:bg-amber-400 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors"
                     >
                       Try Again
                     </button>
@@ -344,7 +354,7 @@ export default function App() {
                 {!isLoading && !fetchError && recipes.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
                     <div className="text-5xl mb-4">🍽</div>
-                    <p className="text-slate-200 font-semibold mb-1">No recipes found</p>
+                    <p className="text-slate-800 font-semibold mb-1">No recipes found</p>
                     <p className="text-slate-500 text-sm">Try enabling more appliances above.</p>
                   </div>
                 )}
@@ -357,14 +367,14 @@ export default function App() {
                       return (
                         <div
                           key={recipe.id}
-                          className={`bg-slate-800 rounded-2xl border-2 shadow-sm overflow-hidden transition-all ${
+                          className={`bg-white rounded-2xl border-2 shadow-sm overflow-hidden transition-all ${
                             isSelected
-                              ? 'border-amber-400 shadow-amber-500/10 shadow-lg'
-                              : 'border-slate-700 hover:border-slate-500 hover:shadow-md hover:shadow-black/30'
+                              ? 'border-amber-400 shadow-amber-500/20 shadow-lg'
+                              : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                           }`}
                         >
                           {/* Card image */}
-                          <div className="relative h-36 bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden">
+                          <div className="relative h-36 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                             {recipe.image ? (
                               <img
                                 src={recipe.image}
@@ -377,27 +387,27 @@ export default function App() {
                               </div>
                             )}
                             {isSelected && (
-                              <span className="absolute top-2 right-2 text-xs bg-amber-500/90 text-slate-950 font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">
+                              <span className="absolute top-2 right-2 text-xs bg-amber-500 text-white font-semibold px-2 py-0.5 rounded-full shadow">
                                 In cart
                               </span>
                             )}
                           </div>
 
                           <div className="p-5">
-                            <h2 className="text-base font-semibold text-slate-100 leading-snug mb-1 line-clamp-2">
+                            <h2 className="text-base font-semibold text-slate-900 leading-snug mb-1 line-clamp-2">
                               {recipe.name}
                             </h2>
-                            <p className="text-sm text-slate-400 mb-4 line-clamp-2">
+                            <p className="text-sm text-slate-500 mb-4 line-clamp-2">
                               {recipe.description}
                             </p>
-                            <div className="flex items-center flex-wrap gap-2 text-xs text-slate-500 mb-4">
+                            <div className="flex items-center flex-wrap gap-2 text-xs text-slate-400 mb-4">
                               <span>⏱ {recipe.time}</span>
                               <span>🍽 {recipe.servings} serving{recipe.servings !== 1 ? 's' : ''}</span>
                               <span>🧂 {recipe.ingredients.length} ingredients</span>
                             </div>
                             <button
                               onClick={() => openRecipe(recipe)}
-                              className="w-full text-sm font-semibold py-2.5 rounded-xl transition-colors bg-amber-500 hover:bg-amber-400 text-slate-950"
+                              className="w-full text-sm font-semibold py-2.5 rounded-xl transition-colors bg-amber-500 hover:bg-amber-400 text-white"
                             >
                               View Recipe
                             </button>
@@ -413,7 +423,7 @@ export default function App() {
               <div>
                 <button
                   onClick={() => setActiveRecipe(null)}
-                  className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-100 mb-6 transition-colors"
+                  className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 mb-6 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -422,8 +432,8 @@ export default function App() {
                 </button>
 
                 {currentRecipe && (
-                  <div className="bg-slate-800 rounded-2xl border border-slate-700 shadow-sm overflow-hidden">
-                    <div className="relative h-48 bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden">
+                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                       {currentRecipe.image ? (
                         <img
                           src={currentRecipe.image}
@@ -438,25 +448,25 @@ export default function App() {
                     </div>
                     <div className="p-6">
                       <div className="flex items-start justify-between gap-4 mb-2">
-                        <h1 className="text-2xl font-bold text-white">{currentRecipe.name}</h1>
+                        <h1 className="text-2xl font-bold text-slate-900">{currentRecipe.name}</h1>
                         <button
                           onClick={() => removeRecipe(currentRecipe.id)}
-                          className="shrink-0 text-xs text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-400/50 px-3 py-1.5 rounded-lg transition-colors"
+                          className="shrink-0 text-xs text-red-500 hover:text-red-600 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors"
                         >
                           Remove from cart
                         </button>
                       </div>
-                      <p className="text-slate-400 text-sm mb-4">{currentRecipe.description}</p>
+                      <p className="text-slate-500 text-sm mb-4">{currentRecipe.description}</p>
 
-                      <div className="flex items-center flex-wrap gap-4 text-sm text-slate-500 mb-2 pb-6 border-b border-slate-700">
+                      <div className="flex items-center flex-wrap gap-4 text-sm text-slate-400 mb-2 pb-6 border-b border-gray-200">
                         <span>⏱ {currentRecipe.time}</span>
                         <span>🍽 {currentRecipe.servings} serving{currentRecipe.servings !== 1 ? 's' : ''}</span>
                       </div>
 
                       <div className="mt-6">
                         <div className="flex items-center justify-between mb-4">
-                          <h2 className="text-base font-semibold text-white">Ingredients</h2>
-                          <p className="text-xs text-slate-500">Uncheck items you already have</p>
+                          <h2 className="text-base font-semibold text-slate-900">Ingredients</h2>
+                          <p className="text-xs text-slate-400">Uncheck items you already have</p>
                         </div>
                         <ul className="space-y-2">
                           {currentRecipe.ingredients.map((ing) => {
@@ -467,8 +477,8 @@ export default function App() {
                                 key={ing.name}
                                 className={`flex items-center gap-3 p-3 rounded-xl border transition-colors cursor-pointer select-none ${
                                   checked
-                                    ? 'bg-slate-700/50 border-slate-600 hover:bg-slate-700'
-                                    : 'bg-slate-800/50 border-slate-700/50'
+                                    ? 'bg-white border-gray-200 hover:bg-gray-50'
+                                    : 'bg-gray-50 border-gray-100'
                                 }`}
                                 onClick={() => toggleItem(currentRecipe.id, ing.name)}
                               >
@@ -476,23 +486,23 @@ export default function App() {
                                   className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
                                     checked
                                       ? 'bg-amber-500 border-amber-500'
-                                      : 'bg-transparent border-slate-600'
+                                      : 'bg-white border-gray-300'
                                   }`}
                                 >
                                   {checked && (
-                                    <svg className="w-3 h-3 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                   )}
                                 </div>
                                 <span
                                   className={`flex-1 text-sm font-medium capitalize transition-colors ${
-                                    checked ? 'text-slate-100' : 'text-slate-600 line-through'
+                                    checked ? 'text-slate-800' : 'text-slate-400 line-through'
                                   }`}
                                 >
                                   {ing.name}
                                 </span>
-                                <span className={`text-sm shrink-0 ${checked ? 'text-slate-400' : 'text-slate-700'}`}>
+                                <span className={`text-sm shrink-0 ${checked ? 'text-slate-500' : 'text-slate-300'}`}>
                                   {formatQty(ing.qty)}{ing.unit ? ` ${ing.unit}` : ''}
                                 </span>
                               </li>
@@ -509,14 +519,14 @@ export default function App() {
 
           {/* Master Cart Sidebar */}
           <aside className="lg:w-80 shrink-0">
-            <div className="bg-slate-800 rounded-2xl border border-slate-700 shadow-sm sticky top-24">
-              <div className="p-5 border-b border-slate-700">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm sticky top-24">
+              <div className="p-5 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <h2 className="text-base font-semibold text-slate-900 flex items-center gap-2">
                     <span>🛒</span> Master Cart
                   </h2>
                   {cartItems.length > 0 && (
-                    <span className="text-xs bg-amber-500/20 text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-400/30">
+                    <span className="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full border border-amber-200">
                       {cartItems.length} items
                     </span>
                   )}
@@ -529,7 +539,7 @@ export default function App() {
                       return (
                         <span
                           key={id}
-                          className="inline-flex items-center gap-1 text-xs bg-slate-700 text-slate-300 border border-slate-600 px-2 py-1 rounded-full"
+                          className="inline-flex items-center gap-1 text-xs bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 rounded-full"
                         >
                           🍽 {r.name}
                         </span>
@@ -543,20 +553,20 @@ export default function App() {
                 {cartItems.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-3">🧺</div>
-                    <p className="text-sm text-slate-400 font-medium">Your cart is empty</p>
-                    <p className="text-xs text-slate-600 mt-1">Open a recipe to add ingredients</p>
+                    <p className="text-sm text-slate-500 font-medium">Your cart is empty</p>
+                    <p className="text-xs text-slate-400 mt-1">Open a recipe to add ingredients</p>
                   </div>
                 ) : (
                   <ul className="space-y-2 mb-5 max-h-[420px] overflow-y-auto pr-1">
                     {cartItems.map((item) => (
                       <li
                         key={item.name}
-                        className="flex items-center justify-between gap-2 py-2 border-b border-slate-700/50 last:border-0"
+                        className="flex items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0"
                       >
-                        <span className="text-sm font-medium text-slate-200 capitalize">
+                        <span className="text-sm font-medium text-slate-800 capitalize">
                           {item.name}
                         </span>
-                        <span className="text-xs text-slate-400 shrink-0 bg-slate-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs text-slate-500 shrink-0 bg-slate-100 px-2 py-0.5 rounded-full">
                           {formatEntries(item.entries)}
                         </span>
                       </li>
@@ -566,8 +576,15 @@ export default function App() {
 
                 <button
                   disabled={cartItems.length === 0}
-                  onClick={() => setShowModal(true)}
-                  className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-600 disabled:cursor-not-allowed text-slate-950 font-bold text-sm py-3 rounded-xl transition-colors"
+                  onClick={() => {
+                    const query = cartItems.map((item) => item.name).join('+')
+                    window.open(
+                      `https://www.amazon.com/s?k=${encodeURIComponent(query)}&i=amazonfresh`,
+                      '_blank',
+                      'noopener,noreferrer'
+                    )
+                  }}
+                  className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm py-3 rounded-xl transition-colors"
                 >
                   Order Groceries
                 </button>
@@ -580,16 +597,16 @@ export default function App() {
       {/* Order Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={(e) => { if (e.target === e.currentTarget && !isOrdering) setShowModal(false) }}
         >
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-slate-700">
-              <h2 className="text-lg font-bold text-white">Order Summary</h2>
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-slate-900">Order Summary</h2>
               <button
                 onClick={() => !isOrdering && setShowModal(false)}
                 disabled={isOrdering}
-                className="text-slate-500 hover:text-slate-300 disabled:opacity-30 transition-colors"
+                className="text-slate-400 hover:text-slate-600 disabled:opacity-30 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -598,18 +615,18 @@ export default function App() {
             </div>
 
             <div className="p-6">
-              <p className="text-sm text-slate-400 mb-4">
-                <span className="font-semibold text-slate-100">{cartItems.length} items</span>{' '}
+              <p className="text-sm text-slate-500 mb-4">
+                <span className="font-semibold text-slate-900">{cartItems.length} items</span>{' '}
                 ready to go — copy the list or send directly to Instacart:
               </p>
               <ul className="space-y-2 max-h-64 overflow-y-auto">
                 {cartItems.map((item) => (
                   <li
                     key={item.name}
-                    className="flex items-center justify-between gap-3 p-3 bg-slate-700/60 rounded-xl"
+                    className="flex items-center justify-between gap-3 p-3 bg-slate-50 rounded-xl"
                   >
-                    <span className="text-sm font-medium text-slate-200 capitalize">{item.name}</span>
-                    <span className="text-xs text-slate-400 shrink-0">{formatEntries(item.entries)}</span>
+                    <span className="text-sm font-medium text-slate-800 capitalize">{item.name}</span>
+                    <span className="text-xs text-slate-500 shrink-0">{formatEntries(item.entries)}</span>
                   </li>
                 ))}
               </ul>
@@ -623,7 +640,7 @@ export default function App() {
                 className={`flex-1 flex items-center justify-center gap-2 text-sm font-semibold py-2.5 rounded-xl border transition-all disabled:cursor-not-allowed ${
                   isCopied
                     ? 'bg-emerald-500 border-emerald-500 text-white'
-                    : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-white disabled:opacity-40'
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 disabled:opacity-40'
                 }`}
               >
                 {isCopied ? (
@@ -642,7 +659,7 @@ export default function App() {
               <button
                 onClick={exportToInstacart}
                 disabled={isOrdering || cartItems.length === 0}
-                className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 disabled:cursor-not-allowed text-slate-950 font-bold text-sm py-2.5 rounded-xl transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 disabled:cursor-not-allowed text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
               >
                 {isOrdering ? (
                   <>
