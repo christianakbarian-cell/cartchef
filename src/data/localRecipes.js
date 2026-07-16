@@ -50,7 +50,7 @@ export const localRecipes = [
   {
     id: 900002,
     title: 'Air Fryer Quesadilla',
-    image: 'https://images.unsplash.com/photo-1777013485814-288099531e5a?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1673990349292-ed2dfa7988c9?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 12,
     servings: 1,
     summary:
@@ -155,7 +155,7 @@ export const localRecipes = [
   {
     id: 900004,
     title: 'Air Fryer Pizza Bagels',
-    image: 'https://images.unsplash.com/photo-1649688423692-308d2fc1027d?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 10,
     servings: 1,
     summary:
