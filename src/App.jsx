@@ -91,6 +91,7 @@ export default function App() {
   const [showModal, setShowModal] = useState(false)
   const [isOrdering, setIsOrdering] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
+  const [isDescExpanded, setIsDescExpanded] = useState(false)
 
   // Persists across renders; never triggers re-renders
   const recipeCache = useRef(new Map())
@@ -168,6 +169,7 @@ export default function App() {
   }
 
   function openRecipe(recipe) {
+    setIsDescExpanded(false)
     setActiveRecipe(recipe.id)
     setSelectedRecipes((prev) => {
       const next = new Set(prev)
@@ -459,7 +461,43 @@ export default function App() {
                           Remove from cart
                         </button>
                       </div>
-                      <p className="text-slate-500 text-sm leading-relaxed mb-4">{currentRecipe.description}</p>
+                      {(() => {
+                        const THRESHOLD = 180
+                        // Strip any residual HTML before slicing so we never cut a tag in half
+                        const desc = currentRecipe.description.replace(/<[^>]*>/g, '').trim()
+                        const isLong = desc.length > THRESHOLD
+                        return (
+                          <p className="text-slate-500 text-sm leading-relaxed mb-4">
+                            {isLong && !isDescExpanded ? (
+                              <>
+                                {desc.slice(0, THRESHOLD)}
+                                {'… '}
+                                <button
+                                  onClick={() => setIsDescExpanded(true)}
+                                  className="text-amber-600 hover:text-amber-700 font-medium inline-block transition-colors"
+                                >
+                                  View More
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {desc}
+                                {isLong && (
+                                  <>
+                                    {' '}
+                                    <button
+                                      onClick={() => setIsDescExpanded(false)}
+                                      className="text-amber-600 hover:text-amber-700 font-medium ml-1 inline-block transition-colors"
+                                    >
+                                      View Less
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </p>
+                        )
+                      })()}
 
                       <div className="flex items-center flex-wrap gap-4 text-sm text-slate-400 mb-2 pb-6 border-b border-gray-200">
                         <span>⏱ {currentRecipe.time}</span>
