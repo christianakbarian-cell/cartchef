@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { localRecipes } from './data/localRecipes'
+import { getCached, setCached } from './utils/recipeCache'
+
+// Parse all API keys from VITE_SPOONACULAR_KEYS (comma-separated) or fall back
+// to the single-key variable. Supports full key rotation across multiple accounts.
+const API_KEYS = (import.meta.env.VITE_SPOONACULAR_KEYS ?? import.meta.env.VITE_SPOONACULAR_KEY ?? '')
+  .split(',')
+  .map((k) => k.trim())
+  .filter(Boolean)
 
 const APPLIANCES = [
   { id: 'microwave', label: 'Microwave', emoji: '📡', apiName: 'microwave' },
@@ -94,8 +102,8 @@ export default function App() {
   const [isCopied, setIsCopied] = useState(false)
   const [isDescExpanded, setIsDescExpanded] = useState(false)
 
-  // Persists across renders; never triggers re-renders
-  const recipeCache = useRef(new Map())
+  // Tracks API keys that returned 402 this session so we skip them immediately
+  const exhaustedKeys = useRef(new Set())
 
   // Serialize appliances to a stable string for the effect dependency
   const applianceKey = JSON.stringify(appliances)
@@ -124,38 +132,57 @@ export default function App() {
             return activeAppliances.some((name) => usedEquipment.includes(name.toLowerCase()))
           })
 
-      // Cache keys: one per appliance name, or '__all__' when nothing is selected
+      // One query key per active appliance, or '__all__' when nothing is selected
       const cacheKeys = activeAppliances.length > 0 ? activeAppliances : ['__all__']
-
-      // Only hit the API for keys not already in the session cache
-      const uncachedKeys = cacheKeys.filter((key) => !recipeCache.current.has(key))
 
       const baseUrl =
         `https://api.spoonacular.com/recipes/complexSearch` +
-        `?apiKey=${import.meta.env.VITE_SPOONACULAR_KEY}` +
-        `&number=9&fillIngredients=true&addRecipeInformation=true`
+        `?number=9&fillIngredients=true&addRecipeInformation=true`
 
-      try {
-        if (uncachedKeys.length > 0) {
-          const urls = uncachedKeys.map((key) =>
-            key === '__all__' ? baseUrl : `${baseUrl}&equipment=${encodeURIComponent(key)}`
-          )
-          const responses = await Promise.all(urls.map((url) => fetch(url)))
-          for (const res of responses) {
-            if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
+      /**
+       * Fetch one appliance query with two layers of defense:
+       *   1. localStorage cache (24-hour TTL) — zero API points consumed
+       *   2. Key rotation — if the active key returns 402, silently retry
+       *      with the next key in the list until one succeeds or all are exhausted
+       */
+      async function fetchAppliance(applianceName) {
+        // Layer 1: check persistent cache first
+        const cached = getCached(applianceName)
+        if (cached !== null) return cached
+
+        // Layer 2: call the API with key rotation
+        const queryUrl =
+          applianceName === '__all__'
+            ? baseUrl
+            : `${baseUrl}&equipment=${encodeURIComponent(applianceName)}`
+
+        const available = API_KEYS.filter((k) => !exhaustedKeys.current.has(k))
+        for (const key of available) {
+          const res = await fetch(`${queryUrl}&apiKey=${key}`)
+          if (res.status === 402) {
+            // This key is out of quota — mark it and try the next one
+            exhaustedKeys.current.add(key)
+            continue
           }
-          const dataArr = await Promise.all(responses.map((res) => res.json()))
-          // Store each appliance's raw results in the cache
-          uncachedKeys.forEach((key, i) => {
-            recipeCache.current.set(key, dataArr[i].results ?? [])
-          })
+          if (!res.ok) throw new Error(`Spoonacular error ${res.status}`)
+          const results = (await res.json()).results ?? []
+          // Persist to localStorage so the next load costs 0 API points
+          setCached(applianceName, results)
+          return results
         }
 
-        // All active keys are now cached — flatten and deduplicate by recipe ID
+        // All keys exhausted — signal caller to fall back to local recipes
+        throw new Error('quota_exceeded')
+      }
+
+      try {
+        const allResults = await Promise.all(cacheKeys.map(fetchAppliance))
+
+        // Flatten and deduplicate across appliance queries
         const seen = new Set()
         const merged = []
-        for (const key of cacheKeys) {
-          for (const r of (recipeCache.current.get(key) ?? [])) {
+        for (const results of allResults) {
+          for (const r of results) {
             if (!seen.has(r.id)) {
               seen.add(r.id)
               merged.push(r)
@@ -163,10 +190,10 @@ export default function App() {
           }
         }
 
-        // Filtered local recipes first, then deduplicated live Spoonacular results
+        // Local favorites first, then live Spoonacular results
         if (!cancelled) setRecipes([...filteredLocal.map(mapRecipe), ...merged.map(mapRecipe)])
       } catch (err) {
-        // API failed — silently fall back to filtered local recipes; no error banner shown
+        // API unavailable or quota exceeded — silently show local recipes only
         console.warn('Spoonacular fetch failed, using local recipes:', err.message)
         if (!cancelled) setRecipes(filteredLocal.map(mapRecipe))
       } finally {

@@ -305,4 +305,198 @@ export const localRecipes = [
       },
     ],
   },
+
+  {
+    id: 900007,
+    title: 'Air Fryer Grilled Cheese',
+    image: 'https://images.unsplash.com/photo-1528736235302-52922df5c122?auto=format&fit=crop&w=636&q=80',
+    readyInMinutes: 8,
+    servings: 1,
+    summary:
+      '<b>Air Fryer Grilled Cheese</b> produces a perfectly golden, crispy crust with fully melted cheese every single time — no buttered pan, no flipping required. ' +
+      'The circulating hot air of the air fryer toasts both sides simultaneously, making this faster and more foolproof than the stovetop version. ' +
+      'Use any sliced cheese you have on hand — American melts the smoothest, cheddar adds flavor, Swiss is excellent if you want to feel fancy.',
+    extendedIngredients: [
+      { id: 18064, originalName: 'white sandwich bread', name: 'sandwich bread', amount: 2, unit: 'slices', image: 'white-bread.png' },
+      { id: 1041009, originalName: 'American cheese slices', name: 'American cheese', amount: 2, unit: 'slices', image: 'cheddar-cheese.png' },
+      { id: 1001, originalName: 'softened butter', name: 'butter', amount: 1, unit: 'tbsp', image: 'butter.png' },
+    ],
+    analyzedInstructions: [
+      {
+        name: '',
+        steps: [
+          {
+            number: 1,
+            step: 'Butter one side of each bread slice. Place cheese slices between the unbuttered sides to make a sandwich.',
+            ingredients: [
+              { id: 18064, name: 'bread', localizedName: 'bread', image: 'white-bread.png' },
+              { id: 1041009, name: 'cheese', localizedName: 'cheese', image: 'cheddar-cheese.png' },
+              { id: 1001, name: 'butter', localizedName: 'butter', image: 'butter.png' },
+            ],
+            equipment: [],
+          },
+          {
+            number: 2,
+            step: 'Place the sandwich in the air fryer basket buttered-side down. Air fry at 370°F (188°C) for 4 minutes.',
+            ingredients: [],
+            equipment: [{ id: 1234, name: 'air fryer', localizedName: 'air fryer', image: 'air-fryer.png' }],
+          },
+          {
+            number: 3,
+            step: 'Flip carefully and air fry for another 3–4 minutes until both sides are golden and the cheese is fully melted. Slice and serve immediately.',
+            ingredients: [],
+            equipment: [{ id: 1234, name: 'air fryer', localizedName: 'air fryer', image: 'air-fryer.png' }],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 900008,
+    title: 'Microwave Scrambled Eggs',
+    image: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=636&q=80',
+    readyInMinutes: 4,
+    servings: 1,
+    summary:
+      '<b>Microwave Scrambled Eggs</b> are a genuine dorm-room power move — fluffy, protein-packed, and ready in under 4 minutes using nothing but a mug. ' +
+      'Beating the eggs thoroughly with a splash of milk before microwaving in short bursts is the secret to soft, creamy curds instead of a rubbery sponge. ' +
+      'Season with salt, pepper, and a pinch of garlic powder, and top with shredded cheese for a complete breakfast that costs under a dollar.',
+    extendedIngredients: [
+      { id: 1123, originalName: 'large eggs', name: 'eggs', amount: 2, unit: 'large', image: 'egg.png' },
+      { id: 1077, originalName: 'whole milk', name: 'whole milk', amount: 2, unit: 'tbsp', image: 'milk.png' },
+      { id: 1041009, originalName: 'shredded cheddar cheese', name: 'shredded cheddar cheese', amount: 2, unit: 'tbsp', image: 'cheddar-cheese.png' },
+      { id: 1102047, originalName: 'salt and black pepper', name: 'salt and pepper', amount: 1, unit: 'pinch', image: 'salt.png' },
+    ],
+    analyzedInstructions: [
+      {
+        name: '',
+        steps: [
+          {
+            number: 1,
+            step: 'Crack eggs into a large microwave-safe mug. Add milk, salt, and pepper. Beat vigorously with a fork until fully combined and slightly frothy.',
+            ingredients: [
+              { id: 1123, name: 'eggs', localizedName: 'eggs', image: 'egg.png' },
+              { id: 1077, name: 'milk', localizedName: 'milk', image: 'milk.png' },
+            ],
+            equipment: [{ id: 404784, name: 'microwave', localizedName: 'microwave', image: 'microwave.png' }],
+          },
+          {
+            number: 2,
+            step: 'Microwave on high for 30 seconds. Stir with a fork, pushing cooked edges toward the center. Microwave in 20-second intervals, stirring each time, until eggs are just set but still slightly glossy (about 90 seconds total).',
+            ingredients: [],
+            equipment: [{ id: 404784, name: 'microwave', localizedName: 'microwave', image: 'microwave.png' }],
+          },
+          {
+            number: 3,
+            step: 'Top immediately with shredded cheddar. The residual heat will melt it. Eat straight from the mug.',
+            ingredients: [
+              { id: 1041009, name: 'cheddar cheese', localizedName: 'cheddar cheese', image: 'cheddar-cheese.png' },
+            ],
+            equipment: [{ id: 404784, name: 'microwave', localizedName: 'microwave', image: 'microwave.png' }],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 900009,
+    title: 'Kettle Overnight Oats',
+    image: 'https://images.unsplash.com/photo-1495214783159-3503fd1b572d?auto=format&fit=crop&w=636&q=80',
+    readyInMinutes: 5,
+    servings: 1,
+    summary:
+      '<b>Kettle Overnight Oats</b> require exactly 2 minutes of effort the night before and give you a genuinely filling, nutritious breakfast waiting for you in the morning. ' +
+      'Boiling water from your electric kettle is poured over rolled oats in a jar or mug, then sealed and left overnight. ' +
+      'By morning the oats are perfectly soft and creamy. Stir in honey and peanut butter, top with a sliced banana, and you have a breakfast that actually sustains you through a full morning of class.',
+    extendedIngredients: [
+      { id: 8120, originalName: 'rolled oats', name: 'rolled oats', amount: 0.5, unit: 'cup', image: 'rolled-oats.png' },
+      { id: 19296, originalName: 'honey', name: 'honey', amount: 1, unit: 'tbsp', image: 'honey.png' },
+      { id: 16098, originalName: 'peanut butter', name: 'peanut butter', amount: 1, unit: 'tbsp', image: 'peanut-butter.png' },
+      { id: 9040, originalName: 'banana', name: 'banana', amount: 0.5, unit: 'whole', image: 'banana.png' },
+      { id: 1102047, originalName: 'cinnamon', name: 'cinnamon', amount: 0.25, unit: 'tsp', image: 'cinnamon.png' },
+    ],
+    analyzedInstructions: [
+      {
+        name: '',
+        steps: [
+          {
+            number: 1,
+            step: 'Add rolled oats and a pinch of cinnamon to a mug or jar. Boil water in your electric kettle.',
+            ingredients: [
+              { id: 8120, name: 'rolled oats', localizedName: 'rolled oats', image: 'rolled-oats.png' },
+            ],
+            equipment: [{ id: 5678, name: 'electric kettle', localizedName: 'electric kettle', image: 'kettle.png' }],
+          },
+          {
+            number: 2,
+            step: 'Pour just enough boiling water over the oats to cover them by about ½ inch. Stir once, cover with a plate or lid, and leave overnight (or at least 2 hours).',
+            ingredients: [],
+            equipment: [{ id: 5678, name: 'electric kettle', localizedName: 'electric kettle', image: 'kettle.png' }],
+          },
+          {
+            number: 3,
+            step: 'In the morning, stir in peanut butter and honey until creamy. Top with sliced banana. Eat cold or microwave for 60 seconds for a warm version.',
+            ingredients: [
+              { id: 16098, name: 'peanut butter', localizedName: 'peanut butter', image: 'peanut-butter.png' },
+              { id: 19296, name: 'honey', localizedName: 'honey', image: 'honey.png' },
+              { id: 9040, name: 'banana', localizedName: 'banana', image: 'banana.png' },
+            ],
+            equipment: [],
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: 900010,
+    title: 'Air Fryer Chicken Tenders',
+    image: 'https://images.unsplash.com/photo-1562802378-063ec186a863?auto=format&fit=crop&w=636&q=80',
+    readyInMinutes: 15,
+    servings: 1,
+    summary:
+      '<b>Air Fryer Chicken Tenders</b> come out shockingly crispy — legitimately better than the oven version and a fraction of the calories of deep-fried. ' +
+      'The secret is coating chicken strips in seasoned breadcrumbs and air frying at high heat so the outside shatters while the inside stays juicy. ' +
+      'These are endlessly dippable — ranch, honey mustard, hot sauce, or just ketchup all work. ' +
+      'Make a batch of three and you have a solid high-protein meal that takes 15 minutes start to finish.',
+    extendedIngredients: [
+      { id: 5006, originalName: 'chicken breast strips', name: 'chicken breast', amount: 6, unit: 'oz', image: 'chicken-breast.png' },
+      { id: 18079, originalName: 'plain breadcrumbs', name: 'breadcrumbs', amount: 0.33, unit: 'cup', image: 'breadcrumbs.png' },
+      { id: 1123, originalName: 'egg', name: 'egg', amount: 1, unit: 'whole', image: 'egg.png' },
+      { id: 1002030, originalName: 'garlic powder', name: 'garlic powder', amount: 0.5, unit: 'tsp', image: 'garlic-powder.png' },
+      { id: 1102047, originalName: 'salt and paprika', name: 'salt and paprika', amount: 1, unit: 'pinch', image: 'salt.png' },
+    ],
+    analyzedInstructions: [
+      {
+        name: '',
+        steps: [
+          {
+            number: 1,
+            step: 'Beat egg in a shallow bowl. In another bowl, mix breadcrumbs with garlic powder, paprika, salt, and pepper.',
+            ingredients: [
+              { id: 1123, name: 'egg', localizedName: 'egg', image: 'egg.png' },
+              { id: 18079, name: 'breadcrumbs', localizedName: 'breadcrumbs', image: 'breadcrumbs.png' },
+            ],
+            equipment: [],
+          },
+          {
+            number: 2,
+            step: 'Dip each chicken strip in the egg, then press into the breadcrumb mixture to coat evenly on all sides.',
+            ingredients: [
+              { id: 5006, name: 'chicken', localizedName: 'chicken', image: 'chicken-breast.png' },
+            ],
+            equipment: [],
+          },
+          {
+            number: 3,
+            step: 'Arrange in a single layer in the air fryer basket. Air fry at 400°F (200°C) for 10–12 minutes, flipping once at the halfway point, until golden and cooked through. Serve immediately with dipping sauce.',
+            ingredients: [],
+            equipment: [{ id: 1234, name: 'air fryer', localizedName: 'air fryer', image: 'air-fryer.png' }],
+          },
+        ],
+      },
+    ],
+  },
 ]
