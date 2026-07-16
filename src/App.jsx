@@ -166,11 +166,9 @@ export default function App() {
         // Filtered local recipes first, then deduplicated live Spoonacular results
         if (!cancelled) setRecipes([...filteredLocal.map(mapRecipe), ...merged.map(mapRecipe)])
       } catch (err) {
-        // API failed — fall back to filtered local recipes only so the app stays functional
-        if (!cancelled) {
-          setRecipes(filteredLocal.map(mapRecipe))
-          setFetchError(err.message || 'Failed to load recipes.')
-        }
+        // API failed — silently fall back to filtered local recipes; no error banner shown
+        console.warn('Spoonacular fetch failed, using local recipes:', err.message)
+        if (!cancelled) setRecipes(filteredLocal.map(mapRecipe))
       } finally {
         if (!cancelled) setIsLoading(false)
       }
