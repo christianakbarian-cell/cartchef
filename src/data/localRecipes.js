@@ -355,7 +355,7 @@ export const localRecipes = [
   {
     id: 900008,
     title: 'Microwave Scrambled Eggs',
-    image: 'https://images.unsplash.com/photo-1759216280514-a4d6465d770a?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1559332167-dd24746aa6f5?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 4,
     servings: 1,
     summary:
