@@ -355,7 +355,7 @@ export const localRecipes = [
   {
     id: 900008,
     title: 'Microwave Scrambled Eggs',
-    image: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1759216280514-a4d6465d770a?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 4,
     servings: 1,
     summary:
@@ -403,7 +403,7 @@ export const localRecipes = [
   {
     id: 900009,
     title: 'Kettle Overnight Oats',
-    image: 'https://images.unsplash.com/photo-1495214783159-3503fd1b572d?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1757592797229-c3fbc50e9c6c?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 5,
     servings: 1,
     summary:
@@ -453,7 +453,7 @@ export const localRecipes = [
   {
     id: 900010,
     title: 'Air Fryer Chicken Tenders',
-    image: 'https://images.unsplash.com/photo-1562802378-063ec186a863?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-1619019187211-adf2f6119afd?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 15,
     servings: 1,
     summary:
