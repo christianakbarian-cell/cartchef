@@ -50,7 +50,7 @@ export const localRecipes = [
   {
     id: 900002,
     title: 'Air Fryer Quesadilla',
-    image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-c2F9Gw5QPUI?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 12,
     servings: 1,
     summary:
@@ -155,7 +155,7 @@ export const localRecipes = [
   {
     id: 900004,
     title: 'Air Fryer Pizza Bagels',
-    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-ja4jFOEpUo8?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 10,
     servings: 1,
     summary:
@@ -205,7 +205,7 @@ export const localRecipes = [
   {
     id: 900005,
     title: 'Microwave Loaded Baked Potato',
-    image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=636&q=80',
+    image: 'https://images.unsplash.com/photo-X2X-uV6PE_A?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 12,
     servings: 1,
     summary:
