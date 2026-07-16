@@ -28,8 +28,7 @@ function mapRecipe(r) {
     }))
 
   const summary = r.summary ? stripHtml(r.summary) : ''
-  const description =
-    summary.length > 130 ? summary.slice(0, 130) + '…' : summary || 'A great recipe for your dorm room.'
+  const description = summary || 'A great recipe for your dorm room.'
 
   return {
     id: String(r.id),
@@ -397,7 +396,7 @@ export default function App() {
                             <h2 className="text-base font-semibold text-slate-900 leading-snug mb-1 line-clamp-2">
                               {recipe.name}
                             </h2>
-                            <p className="text-sm text-slate-500 mb-4 line-clamp-2">
+                            <p className="text-sm text-slate-500 mb-4 line-clamp-3">
                               {recipe.description}
                             </p>
                             <div className="flex items-center flex-wrap gap-2 text-xs text-slate-400 mb-4">
@@ -431,12 +430,16 @@ export default function App() {
                   Back to Recipes
                 </button>
 
-                {currentRecipe && (
+                {currentRecipe && (() => {
+                  const highResImage = currentRecipe.image
+                    ? currentRecipe.image.replace('312x231', '636x393')
+                    : null
+                  return (
                   <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                      {currentRecipe.image ? (
+                    <div className="relative h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                      {highResImage ? (
                         <img
-                          src={currentRecipe.image}
+                          src={highResImage}
                           alt={currentRecipe.name}
                           className="w-full h-full object-cover"
                         />
@@ -456,7 +459,7 @@ export default function App() {
                           Remove from cart
                         </button>
                       </div>
-                      <p className="text-slate-500 text-sm mb-4">{currentRecipe.description}</p>
+                      <p className="text-slate-500 text-sm leading-relaxed mb-4">{currentRecipe.description}</p>
 
                       <div className="flex items-center flex-wrap gap-4 text-sm text-slate-400 mb-2 pb-6 border-b border-gray-200">
                         <span>⏱ {currentRecipe.time}</span>
@@ -512,7 +515,8 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                )}
+                  )
+                })()}
               </div>
             )}
           </main>
