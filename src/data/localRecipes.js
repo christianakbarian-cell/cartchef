@@ -2,7 +2,7 @@ export const localRecipes = [
   {
     id: 900001,
     title: 'Microwave Mug Mac & Cheese',
-    image: 'https://image.pollinations.ai/prompt/creamy%20macaroni%20and%20cheese%20in%20a%20mug,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1543339494-b4cd4f7ba686?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 5,
     servings: 1,
     summary:
@@ -50,7 +50,7 @@ export const localRecipes = [
   {
     id: 900002,
     title: 'Air Fryer Quesadilla',
-    image: 'https://image.pollinations.ai/prompt/crispy%20chicken%20quesadilla%20on%20a%20wooden%20plate,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 12,
     servings: 1,
     summary:
@@ -102,7 +102,7 @@ export const localRecipes = [
   {
     id: 900003,
     title: 'Gourmet Kettle Ramen',
-    image: 'https://image.pollinations.ai/prompt/ramen%20noodles%20in%20a%20bowl%20with%20spinach%20and%20egg,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 8,
     servings: 1,
     summary:
@@ -155,7 +155,7 @@ export const localRecipes = [
   {
     id: 900004,
     title: 'Air Fryer Pizza Bagels',
-    image: 'https://image.pollinations.ai/prompt/pizza%20bagels%20with%20pepperoni%20and%20melted%20cheese,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 10,
     servings: 1,
     summary:
@@ -205,7 +205,7 @@ export const localRecipes = [
   {
     id: 900005,
     title: 'Microwave Loaded Baked Potato',
-    image: 'https://image.pollinations.ai/prompt/loaded%20baked%20potato%20with%20sour%20cream%20and%20bacon,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 12,
     servings: 1,
     summary:
@@ -255,7 +255,7 @@ export const localRecipes = [
   {
     id: 900006,
     title: 'Microwave Mug Brownie',
-    image: 'https://image.pollinations.ai/prompt/rich%20fudge%20brownie%20in%20a%20mug,%20high%20resolution%20food%20photography',
+    image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=636&q=80',
     readyInMinutes: 5,
     servings: 1,
     summary:
