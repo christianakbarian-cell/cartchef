@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { localRecipes } from './data/localRecipes'
 
 const APPLIANCES = [
   { id: 'microwave', label: 'Microwave', emoji: '📡', apiName: 'microwave' },
@@ -151,9 +152,14 @@ export default function App() {
           }
         }
 
-        if (!cancelled) setRecipes(merged.map(mapRecipe))
+        // Prepend curated local recipes, then deduplicated Spoonacular results
+        if (!cancelled) setRecipes([...localRecipes.map(mapRecipe), ...merged.map(mapRecipe)])
       } catch (err) {
-        if (!cancelled) setFetchError(err.message || 'Failed to load recipes.')
+        // API failed — show local recipes only so the app stays functional
+        if (!cancelled) {
+          setRecipes(localRecipes.map(mapRecipe))
+          setFetchError(err.message || 'Failed to load recipes.')
+        }
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -365,12 +371,15 @@ export default function App() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                     {recipes.map((recipe) => {
                       const isSelected = selectedRecipes.has(recipe.id)
+                      const isFeatured = String(recipe.id).startsWith('90000')
                       return (
                         <div
                           key={recipe.id}
                           className={`bg-white rounded-2xl border-2 shadow-sm overflow-hidden transition-all ${
                             isSelected
                               ? 'border-amber-400 shadow-amber-500/20 shadow-lg'
+                              : isFeatured
+                              ? 'border-violet-200 hover:border-violet-300 hover:shadow-md'
                               : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                           }`}
                         >
@@ -386,6 +395,12 @@ export default function App() {
                               <div className="w-full h-full flex items-center justify-center text-5xl">
                                 🍽
                               </div>
+                            )}
+                            {/* Badges — Featured takes bottom-left, In Cart takes top-right */}
+                            {isFeatured && !isSelected && (
+                              <span className="absolute bottom-2 left-2 text-xs bg-violet-500 text-white font-semibold px-2 py-0.5 rounded-full shadow">
+                                ⭐ Featured
+                              </span>
                             )}
                             {isSelected && (
                               <span className="absolute top-2 right-2 text-xs bg-amber-500 text-white font-semibold px-2 py-0.5 rounded-full shadow">
