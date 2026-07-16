@@ -113,6 +113,17 @@ export default function App() {
 
       const activeAppliances = APPLIANCES.filter((a) => appliances[a.id]).map((a) => a.apiName)
 
+      // Filter local recipes client-side by cross-referencing each recipe's step equipment
+      // against the active appliance names (OR logic — a recipe passes if it uses ANY active appliance)
+      const filteredLocal = activeAppliances.length === 0
+        ? localRecipes
+        : localRecipes.filter((recipe) => {
+            const usedEquipment = (recipe.analyzedInstructions?.[0]?.steps ?? [])
+              .flatMap((step) => step.equipment ?? [])
+              .map((e) => e.name.toLowerCase())
+            return activeAppliances.some((name) => usedEquipment.includes(name.toLowerCase()))
+          })
+
       // Cache keys: one per appliance name, or '__all__' when nothing is selected
       const cacheKeys = activeAppliances.length > 0 ? activeAppliances : ['__all__']
 
@@ -152,12 +163,12 @@ export default function App() {
           }
         }
 
-        // Prepend curated local recipes, then deduplicated Spoonacular results
-        if (!cancelled) setRecipes([...localRecipes.map(mapRecipe), ...merged.map(mapRecipe)])
+        // Filtered local recipes first, then deduplicated live Spoonacular results
+        if (!cancelled) setRecipes([...filteredLocal.map(mapRecipe), ...merged.map(mapRecipe)])
       } catch (err) {
-        // API failed — show local recipes only so the app stays functional
+        // API failed — fall back to filtered local recipes only so the app stays functional
         if (!cancelled) {
-          setRecipes(localRecipes.map(mapRecipe))
+          setRecipes(filteredLocal.map(mapRecipe))
           setFetchError(err.message || 'Failed to load recipes.')
         }
       } finally {
