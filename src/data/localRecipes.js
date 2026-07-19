@@ -16,6 +16,11 @@ export const localRecipes = [
       { id: 1001, originalName: 'butter', name: 'butter', amount: 1, unit: 'tsp', image: 'butter.png' },
       { id: 1019, originalName: 'garlic powder', name: 'garlic powder', amount: 0.25, unit: 'tsp', image: 'garlic-powder.png' },
     ],
+    instructions: [
+      "Add macaroni to a large microwave-safe mug. Pour in just enough water to cover the pasta by about half an inch.",
+      "Microwave on high for 2 minutes. Stir, then microwave in 1-minute intervals, stirring each time, until pasta is tender and most water is absorbed (about 3–4 minutes total).",
+      "Stir in milk, butter, and garlic powder. Add shredded cheddar and stir vigorously until the sauce is smooth and creamy. Serve immediately.",
+    ],
     analyzedInstructions: [
       {
         name: '',
@@ -64,6 +69,11 @@ export const localRecipes = [
       { id: 16015, originalName: 'canned black beans, drained', name: 'canned black beans', amount: 0.25, unit: 'cup', image: 'black-beans.png' },
       { id: 6164, originalName: 'salsa', name: 'salsa', amount: 3, unit: 'tbsp', image: 'salsa.png' },
       { id: 1056, originalName: 'sour cream', name: 'sour cream', amount: 2, unit: 'tbsp', image: 'sour-cream.png' },
+    ],
+    instructions: [
+      "Lay the tortilla flat. Spread black beans on one half, top with shredded cheese, then fold in half to form a half-moon.",
+      "Place the folded quesadilla in the air fryer basket. Air fry at 375°F (190°C) for 4 minutes.",
+      "Flip carefully and air fry for another 3–4 minutes until both sides are crispy and golden. Serve with salsa and sour cream.",
     ],
     analyzedInstructions: [
       {
@@ -118,6 +128,11 @@ export const localRecipes = [
       { id: 10011457, originalName: 'fresh spinach', name: 'fresh spinach', amount: 0.5, unit: 'cup', image: 'spinach.png' },
       { id: 1123, originalName: 'egg', name: 'egg', amount: 1, unit: 'whole', image: 'egg.png' },
     ],
+    instructions: [
+      "Boil water in your electric kettle.",
+      "Place ramen noodles and seasoning packet in a bowl. Pour boiling water over the top, add spinach, and cover with a plate for 3 minutes.",
+      "Stir in peanut butter and soy sauce until fully dissolved. Top with green onions and egg.",
+    ],
     analyzedInstructions: [
       {
         name: '',
@@ -168,6 +183,11 @@ export const localRecipes = [
       { id: 1026, originalName: 'shredded mozzarella', name: 'shredded mozzarella', amount: 0.25, unit: 'cup', image: 'mozzarella.png' },
       { id: 10110, originalName: 'pepperoni slices', name: 'pepperoni', amount: 8, unit: 'slices', image: 'pepperoni.png' },
       { id: 2064, originalName: 'dried Italian seasoning', name: 'Italian seasoning', amount: 0.25, unit: 'tsp', image: 'italian-seasoning.png' },
+    ],
+    instructions: [
+      "Slice each bagel in half and spread pizza sauce over the cut side of each half.",
+      "Top each bagel half with shredded mozzarella, pepperoni slices, and a pinch of Italian seasoning.",
+      "Air fry at 375°F (190°C) for 5–6 minutes until cheese is melted and bubbly and bagel edges are golden. Serve immediately.",
     ],
     analyzedInstructions: [
       {
@@ -220,6 +240,11 @@ export const localRecipes = [
       { id: 11291, originalName: 'green onions, sliced', name: 'green onions', amount: 1, unit: 'stalk', image: 'spring-onions.png' },
       { id: 1001, originalName: 'butter', name: 'butter', amount: 1, unit: 'tbsp', image: 'butter.png' },
     ],
+    instructions: [
+      "Scrub the potato and pierce it all over with a fork (at least 10 times). This prevents it from bursting in the microwave.",
+      "Place on a microwave-safe plate and microwave on high for 5 minutes. Flip and microwave for another 3–5 minutes until a fork slides in easily.",
+      "Cut open the potato, fluff with a fork, and top with butter, shredded cheddar, sour cream, bacon bits, and green onions.",
+    ],
     analyzedInstructions: [
       {
         name: '',
@@ -271,6 +296,11 @@ export const localRecipes = [
       { id: 1077, originalName: 'whole milk', name: 'whole milk', amount: 2, unit: 'tbsp', image: 'milk.png' },
       { id: 19081, originalName: 'chocolate chips', name: 'chocolate chips', amount: 1, unit: 'tbsp', image: 'chocolate-chips.png' },
     ],
+    instructions: [
+      "Add flour, cocoa powder, and sugar to a large microwave-safe mug. Stir the dry ingredients together.",
+      "Add vegetable oil and milk. Stir until a smooth batter forms with no dry streaks. Fold in chocolate chips.",
+      "Microwave on high for 60–90 seconds until the top is just set. The center should still look slightly moist — that is the fudgy part. Let cool 1 minute before eating.",
+    ],
     analyzedInstructions: [
       {
         name: '',
@@ -321,6 +351,11 @@ export const localRecipes = [
       { id: 1041009, originalName: 'American cheese slices', name: 'American cheese', amount: 2, unit: 'slices', image: 'cheddar-cheese.png' },
       { id: 1001, originalName: 'softened butter', name: 'butter', amount: 1, unit: 'tbsp', image: 'butter.png' },
     ],
+    instructions: [
+      "Butter one side of each bread slice. Place cheese slices between the unbuttered sides to make a sandwich.",
+      "Place the sandwich in the air fryer basket buttered-side down. Air fry at 370°F (188°C) for 4 minutes.",
+      "Flip carefully and air fry for another 3–4 minutes until both sides are golden and the cheese is fully melted. Slice and serve immediately.",
+    ],
     analyzedInstructions: [
       {
         name: '',
@@ -367,6 +402,11 @@ export const localRecipes = [
       { id: 1077, originalName: 'whole milk', name: 'whole milk', amount: 2, unit: 'tbsp', image: 'milk.png' },
       { id: 1041009, originalName: 'shredded cheddar cheese', name: 'shredded cheddar cheese', amount: 2, unit: 'tbsp', image: 'cheddar-cheese.png' },
       { id: 1102047, originalName: 'salt and black pepper', name: 'salt and pepper', amount: 1, unit: 'pinch', image: 'salt.png' },
+    ],
+    instructions: [
+      "Crack eggs into a large microwave-safe mug. Add milk, salt, and pepper. Beat vigorously with a fork until fully combined and slightly frothy.",
+      "Microwave on high for 30 seconds. Stir with a fork, pushing cooked edges toward the center. Microwave in 20-second intervals, stirring each time, until eggs are just set but still slightly glossy (about 90 seconds total).",
+      "Top immediately with shredded cheddar. The residual heat will melt it. Eat straight from the mug.",
     ],
     analyzedInstructions: [
       {
@@ -416,6 +456,11 @@ export const localRecipes = [
       { id: 16098, originalName: 'peanut butter', name: 'peanut butter', amount: 1, unit: 'tbsp', image: 'peanut-butter.png' },
       { id: 9040, originalName: 'banana', name: 'banana', amount: 0.5, unit: 'whole', image: 'banana.png' },
       { id: 1102047, originalName: 'cinnamon', name: 'cinnamon', amount: 0.25, unit: 'tsp', image: 'cinnamon.png' },
+    ],
+    instructions: [
+      "Add rolled oats and a pinch of cinnamon to a mug or jar. Boil water in your electric kettle.",
+      "Pour just enough boiling water over the oats to cover them by about ½ inch. Stir once, cover with a plate or lid, and leave overnight (or at least 2 hours).",
+      "In the morning, stir in peanut butter and honey until creamy. Top with sliced banana. Eat cold or microwave for 60 seconds for a warm version.",
     ],
     analyzedInstructions: [
       {
@@ -467,6 +512,11 @@ export const localRecipes = [
       { id: 1123, originalName: 'egg', name: 'egg', amount: 1, unit: 'whole', image: 'egg.png' },
       { id: 1002030, originalName: 'garlic powder', name: 'garlic powder', amount: 0.5, unit: 'tsp', image: 'garlic-powder.png' },
       { id: 1102047, originalName: 'salt and paprika', name: 'salt and paprika', amount: 1, unit: 'pinch', image: 'salt.png' },
+    ],
+    instructions: [
+      "Beat egg in a shallow bowl. In another bowl, mix breadcrumbs with garlic powder, paprika, salt, and pepper.",
+      "Dip each chicken strip in the egg, then press into the breadcrumb mixture to coat evenly on all sides.",
+      "Arrange in a single layer in the air fryer basket. Air fry at 400°F (200°C) for 10–12 minutes, flipping once at the halfway point, until golden and cooked through. Serve immediately with dipping sauce.",
     ],
     analyzedInstructions: [
       {

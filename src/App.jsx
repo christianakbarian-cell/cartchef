@@ -23,6 +23,31 @@ function stripHtml(html) {
   return (html ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
 }
 
+// Normalize instructions from local arrays, Spoonacular analyzedInstructions, or HTML
+function extractInstructions(r) {
+  if (Array.isArray(r.instructions) && r.instructions.every((s) => typeof s === 'string')) {
+    return r.instructions.map((s) => s.trim()).filter(Boolean)
+  }
+
+  const fromAnalyzed = (r.analyzedInstructions ?? [])
+    .flatMap((block) => block.steps ?? [])
+    .map((s) => (s.step ?? '').trim())
+    .filter(Boolean)
+  if (fromAnalyzed.length > 0) return fromAnalyzed
+
+  if (typeof r.instructions === 'string' && r.instructions.trim()) {
+    const text = stripHtml(r.instructions)
+    const numbered = text
+      .split(/(?:^|\n)\s*\d+\.\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (numbered.length > 1) return numbered
+    return text ? [text] : []
+  }
+
+  return []
+}
+
 // Transform a Spoonacular recipe object into our internal shape
 function mapRecipe(r) {
   const seen = new Set()
@@ -52,6 +77,7 @@ function mapRecipe(r) {
     // Appliance filtering is done server-side; no per-recipe requirement data from API
     requiredAppliances: [],
     ingredients,
+    instructions: extractInstructions(r),
   }
 }
 

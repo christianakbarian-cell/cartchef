@@ -1,17 +1,24 @@
+import { useState } from 'react'
 import { formatEntries } from '../utils/format'
-import { parseIngredientForSearch } from '../utils/parseIngredientForSearch'
+
+function buildListText(cartItems) {
+  return cartItems
+    .map((item) => {
+      const qty = formatEntries(item.entries)
+      const name = item.name.replace(/\b\w/g, (c) => c.toUpperCase())
+      return qty ? `[ ] ${qty} ${name}` : `[ ] ${name}`
+    })
+    .join('\n')
+}
 
 export default function CartSidebar({ cartItems, selectedRecipes, recipes }) {
-  function orderGroceries() {
-    const query = cartItems
-      .map((item) => parseIngredientForSearch(item.name))
-      .filter(Boolean)
-      .join('+')
-    window.open(
-      `https://www.amazon.com/s?k=${encodeURIComponent(query)}&i=amazonfresh`,
-      '_blank',
-      'noopener,noreferrer'
-    )
+  const [isCopied, setIsCopied] = useState(false)
+
+  async function copyList() {
+    const text = buildListText(cartItems)
+    await navigator.clipboard.writeText(text)
+    setIsCopied(true)
+    setTimeout(() => setIsCopied(false), 2000)
   }
 
   return (
@@ -54,29 +61,21 @@ export default function CartSidebar({ cartItems, selectedRecipes, recipes }) {
               <p className="text-xs text-slate-400 mt-1">Open a recipe to add ingredients</p>
             </div>
           ) : (
-            <ul className="space-y-2 mb-5 max-h-[420px] overflow-y-auto pr-1">
-              {cartItems.map((item) => (
-                <li
-                  key={item.name}
-                  className="flex items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0"
-                >
-                  <span className="text-sm font-medium text-slate-800 capitalize">
-                    {item.name}
-                  </span>
-                  <span className="text-xs text-slate-500 shrink-0 bg-slate-100 px-2 py-0.5 rounded-full">
-                    {formatEntries(item.entries)}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <pre className="mb-5 max-h-[420px] overflow-y-auto pr-1 whitespace-pre-wrap font-sans text-sm text-slate-800 leading-relaxed select-text">
+              {buildListText(cartItems)}
+            </pre>
           )}
 
           <button
             disabled={cartItems.length === 0}
-            onClick={orderGroceries}
-            className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold text-sm py-3 rounded-xl transition-colors"
+            onClick={copyList}
+            className={`w-full font-bold text-sm py-3 rounded-xl transition-colors disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed ${
+              isCopied
+                ? 'bg-emerald-500 text-white'
+                : 'bg-amber-500 hover:bg-amber-400 text-white'
+            }`}
           >
-            Order Groceries
+            {isCopied ? 'Copied! ✓' : 'Copy List'}
           </button>
         </div>
       </div>

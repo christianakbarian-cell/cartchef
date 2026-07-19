@@ -150,6 +150,24 @@ export default function RecipeGrid({
                     })}
                   </ul>
                 </div>
+
+                {(currentRecipe.instructions?.length ?? 0) > 0 && (
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <h2 className="text-base font-semibold text-slate-900 mb-4">Instructions</h2>
+                    <ol className="space-y-3">
+                      {currentRecipe.instructions.map((step, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span className="shrink-0 w-7 h-7 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold flex items-center justify-center">
+                            {index + 1}
+                          </span>
+                          <p className="text-sm text-slate-600 leading-relaxed pt-1">
+                            {step}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
               </div>
             </div>
           )
